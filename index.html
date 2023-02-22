@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Tetris</title>
+		<link rel="stylesheet" href="styles/style.css" />
+	</head>
+	<body>
+		<h1>Tetris</h1>
+		<div class="game">
+			<canvas id="myCanvas" width="400" height="700"></canvas>
+			<div class="scoreboard">
+				<p>Score: <span class="score-value">0</span></p>
+				<p>Lines: <span class="lines-value">0</span></p>
+			</div>
+		</div>
+
+		<script src="scripts/canvas.js" type="module"></script>
+		<script src="scripts/tetromino.js" type="module"></script>
+		<script src="scripts/script.js" type="module"></script>
+	</body>
+</html>
