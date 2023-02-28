@@ -11,6 +11,8 @@ export class Game
 
 		this.supportTetromino = null;
 
+		this.tetrominoIndex;
+
 		this.lines = 0;
 		this.score = 0;
 		
@@ -45,10 +47,16 @@ export class Game
 					this.KeyPressed = 'ArrowRight';
 					break;
 				}
+				case "ArrowUp":
+				{
+					this.KeyPressed = 'ArrowUp';
+					
+					break;
+				}
 				case " ":
 				{
 					this.KeyPressed = "Space";
-					console.log("Space");
+					
 					break;
 				}
 				default:
@@ -74,18 +82,18 @@ export class Game
 				[coordinates[0] + 1, coordinates[1]],
 				[coordinates[0] + 2, coordinates[1]]
 			],	
+			[
+				[coordinates[0],     coordinates[1]],
+				[coordinates[0],     coordinates[1] + 1],
+				[coordinates[0],     coordinates[1] + 2],
+			],
 			[ 	[coordinates[0],     coordinates[1]],
 				[coordinates[0] + 1, coordinates[1]],
 				[coordinates[0],     coordinates[1] + 1],
 				[coordinates[0] + 1, coordinates[1] + 1] 
 			],
 			[
-				[coordinates[0],     coordinates[1]],
-				[coordinates[0],     coordinates[1] + 1],
-				[coordinates[0],     coordinates[1] + 2],
-			],
-			[
-				[coordinates[0],     coordinates[1]],
+				[coordinates[0],     coordinates[1]	   ],
 				[coordinates[0],     coordinates[1] + 1],
 				[coordinates[0],     coordinates[1] + 2],
 				[coordinates[0] + 1, coordinates[1] + 1]
@@ -110,8 +118,190 @@ export class Game
 			]
 		];
 		
-		this.currentTetromino.coordinates = tetrominos[Math.floor(Math.random()*tetrominos.length)];
+		this.rotation = [
+			[
+				[ 	[-1, 1],
+					[0, 0],
+					[1, -1] 
+				]
+				,
+				[
+					[1, -1],
+					[0,  0],
+					[-1,  1]
+				]
+			],
+			[
+				[
+					[1, -1],
+					[0,  0],
+					[-1,  1]
+				]
+				,
+				[ 	[-1, 1],
+					[0, 0],
+					[1, -1] 
+				]
+			],
+			[
+				[
+					[0, 0],
+					[0, 0],
+					[0, 0],
+					[0, 0]
+				]
+			],
+			[
+				[
+					[-1, -1],
+					[0, 0],
+					[1, 1],
+					[1, -1]	
+				],
+				[
+					[0, 0],
+					[0, 0],
+					[-1, -1],
+					[0, 0]
+				],
+				[
+					[0, 0],
+					[0, 0],
+					[0, 0],
+					[-1, 1]
+				],
+				[
+					[1, 1],
+					[0, 0],
+					[0, 0],
+					[0, 0]
+				]
+			],
+			[
+				[
+					[-1, 1],
+					[0, 0],
+					[1, -1],
+					[1, 1]
+				],
+				[
+					[1, -1],
+					[0, 0],
+					[0, 0],
+					[0, 0]
+				],
+				[
+					[0, 0],
+					[0, 0],
+					[0, 0],
+					[-1, -1]
+				],
+				[
+					[0, 0],
+					[0, 0],
+					[-1, 1],
+					[0, 0]
+				]	
+			],
+			[
+				[
+					[-1, -2],
+					[-1, -2],
+					[0, -1],
+					[0,  1]
+				],
+				[
+					[1, 0],
+					[1, 0],
+					[-1, 1],
+					[-1, 1]
+				],
+				[
+					[-1, 0],
+					[-2, 1],
+					[0, 0],
+					[1, -1]
+				],
+				[
+					[0, 2],
+					[1, 1],
+					[0, 0],
+					[-1, -1]
+				]
+			],
+			[
+				[
+					[1, -2],
+					[0, -1],
+					[1, 0],
+					[0, 1]
+				],
+				[
+					[-1, 2],
+					[0, 1],
+					[-1, 0],
+					[0, -1]
+				]
+			]
+		];
+
+		this.tetrominoIndex = Math.floor(Math.random() * tetrominos.length);
+		this.rotationIndex = 0;
+		this.currentTetromino.coordinates = tetrominos[this.tetrominoIndex];
+		
 	}
+
+	rotate()
+	{
+		
+		this.rotationIndex = (this.rotationIndex + 1) % this.rotation[this.tetrominoIndex].length;
+
+		let temp = [...this.currentTetromino.coordinates];
+		
+		let test = false;
+		this.rotation[this.tetrominoIndex][this.rotationIndex].forEach((move, index) => {
+
+
+			if (this.currentTetromino.coordinates[index][0] + move[0] == 0 
+				|| this.currentTetromino.coordinates[index][0] + move[0] == this.canvas.numOfColumns - 1)
+			{
+				
+				this.rotationIndex -= 1;
+				if (this.rotationIndex < 0)
+					this.rotationIndex = this.rotation[this.tetrominoIndex].length - 1;
+				test = true;
+			}
+
+			if (this.currentTetromino.coordinates[index][1] + move[1] == 0 
+				|| this.currentTetromino.coordinates[index][1] + move[1] == this.canvas.numOfColumns - 1)
+			{
+				this.rotationIndex -= 1;
+				if (this.rotationIndex < 0)
+					this.rotationIndex = this.rotation[this.tetrominoIndex].length - 1;
+				test = true;
+			}
+		});
+
+		if (test)
+			return;
+			
+		temp.forEach((coordinate, index) => {
+			let [i, j] = coordinate;
+			this.canvas.matrix[i][j] = 0;
+		});
+
+		this.rotation[this.tetrominoIndex][this.rotationIndex].forEach((move, index) => {
+			this.currentTetromino.coordinates[index][0] += move[0];
+			this.currentTetromino.coordinates[index][1] += move[1];	
+		});
+
+		this.currentTetromino.coordinates.forEach((coordinate, index) => {
+			let [i, j] = coordinate;
+			this.canvas.matrix[i][j] = this.currentTetromino.color;
+		});
+		
+	}
+
 
 	moveDownTetromino()
 	{
@@ -427,6 +617,52 @@ export class Game
 					}
 					
 					
+				}
+				else if (this.KeyPressed == 'ArrowUp')
+				{
+					this.rotate();	
+					
+					this.supportTetromino.forEach((elem) => {	
+						this.canvas.matrix[elem[0]][elem[1]] = 0;
+					});
+					
+					
+					this.supportTetromino = [];
+					
+					this.currentTetromino.coordinates.forEach((coordinate) => {
+						let temp = [];
+						
+						coordinate.forEach((elem) => {
+							temp.push(elem);
+						});
+		
+						this.supportTetromino.push(temp);
+					});
+					
+					this.tetrominoSupport(this.supportTetromino);
+					
+					let same = true;
+
+					this.supportTetromino.forEach((elem, index) => {
+						if (elem[0] !== this.currentTetromino.coordinates[index][0] ||
+							elem[1] !== this.currentTetromino.coordinates[index][1])
+							same = false;
+					});
+
+					if (same)
+					this.currentTetromino.coordinates.forEach((elem) => {
+					
+						this.canvas.matrix[elem[0]][elem[1]] = this.currentTetromino.color;
+					});	
+						
+					let isPossible = this.moveDownTetromino();
+
+					if (!isPossible)
+					{
+						
+						this.currentTetromino = null;
+						this.score += 24;
+					}	
 				}
 				else if (this.KeyPressed == 'ArrowDown' || this.KeyPressed == '')
 				{
