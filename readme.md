@@ -1,4 +1,4 @@
 # To do
 
-+ Rotation functionality
++ ~~Rotation functionality~~
 + Refactoring code
