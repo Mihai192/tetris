@@ -31,7 +31,6 @@ export class DrawManager
 
 	draw(canvas, score, lines)
 	{
-		console.log(score, lines);
 		document.querySelector('.score-value').innerHTML = score;
 		document.querySelector('.lines-value').innerHTML = lines;
 
@@ -43,7 +42,6 @@ export class DrawManager
 				canvas.ctx.fillRect(j * canvas.squareSize, i * canvas.squareSize, canvas.squareSize, canvas.squareSize);		
 				canvas.ctx.stroke();
 			}
-		
-		
+	
 	}
 }
