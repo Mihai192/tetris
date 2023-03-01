@@ -20,6 +20,9 @@ h1 {
 	color: white;
 	text-align: center;
 }
+h2 {
+	color: white;
+}
 
 p {
 	font-size: 2rem;
@@ -28,4 +31,12 @@ p {
 
 .scoreboard {
 	width: 200px;
+}
+
+.controls {
+	position: fixed;
+	top: 0;
+	left: 0;
+	border: 1px solid white;
+	padding: 10px;
 }
