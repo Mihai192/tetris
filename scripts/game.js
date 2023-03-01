@@ -15,7 +15,7 @@ export class Game
 
 		this.lines = 0;
 		this.score = 0;
-		
+		this.numOfPresses = 0;
 
 		this.colors = [
 			"black",
@@ -35,28 +35,37 @@ export class Game
 				case "ArrowDown":
 				{
 					this.KeyPressed = 'ArrowDown';
+					
 					break;
 				} 
 				case "ArrowLeft":
 				{
+					
 					this.KeyPressed = 'ArrowLeft';
+						
+					
 					break;
 				}
 				case "ArrowRight":
 				{
+					
 					this.KeyPressed = 'ArrowRight';
+					
+					
 					break;
 				}
 				case "ArrowUp":
 				{
+					
 					this.KeyPressed = 'ArrowUp';
+					
 					
 					break;
 				}
 				case " ":
 				{
-					this.KeyPressed = "Space";
 					
+					this.KeyPressed = "Space";
 					break;
 				}
 				default:
@@ -205,28 +214,28 @@ export class Game
 			],
 			[
 				[
-					[-1, -2],
-					[-1, -2],
-					[0, -1],
-					[0,  1]
+					[-1, 1],
+					[0, 0],
+					[1, -1],
+					[2,  0]
 				],
 				[
-					[1, 0],
-					[1, 0],
-					[-1, 1],
+					[0, 1],
+					[-1, 0],
+					[-2, -1],
+					[-1, -2]
+				],
+				[
+					[2, 0],
+					[1, 1],
+					[0, 2],
 					[-1, 1]
 				],
 				[
-					[-1, 0],
-					[-2, 1],
-					[0, 0],
-					[1, -1]
-				],
-				[
-					[0, 2],
-					[1, 1],
-					[0, 0],
-					[-1, -1]
+					[-1, -2],
+					[0, -1],
+					[1, 0],
+					[0, 1]
 				]
 			],
 			[
@@ -256,8 +265,18 @@ export class Game
 		
 		this.rotationIndex = (this.rotationIndex + 1) % this.rotation[this.tetrominoIndex].length;
 
-		let temp = [...this.currentTetromino.coordinates];
-		
+		let temp = [];
+
+		this.currentTetromino.coordinates.forEach((coordinate) => {
+			let t = [];
+			
+			coordinate.forEach((elem) => {
+				t.push(elem);
+			});
+
+			temp.push(t);
+		});
+
 		let test = false;
 		this.rotation[this.tetrominoIndex][this.rotationIndex].forEach((move, index) => {
 
@@ -280,26 +299,45 @@ export class Game
 					this.rotationIndex = this.rotation[this.tetrominoIndex].length - 1;
 				test = true;
 			}
+
+			let i = this.currentTetromino.coordinates[index][0] + move[0];
+			let j = this.currentTetromino.coordinates[index][1] + move[1];
+
+			let check = false;
+			this.currentTetromino.coordinates.forEach((coordinate) => {
+				if (coordinate[0] == i && coordinate[1] == j)
+				{
+					check = true;
+					return;
+				}
+			});
+
+			if (!check && this.canvas.matrix[i][j] !== 0)
+				test = true;
 		});
 
 		if (test)
-			return;
+			return false;
 			
 		temp.forEach((coordinate, index) => {
 			let [i, j] = coordinate;
 			this.canvas.matrix[i][j] = 0;
 		});
 
+		console.log(this.rotation[this.tetrominoIndex][this.rotationIndex]);
+
 		this.rotation[this.tetrominoIndex][this.rotationIndex].forEach((move, index) => {
 			this.currentTetromino.coordinates[index][0] += move[0];
 			this.currentTetromino.coordinates[index][1] += move[1];	
 		});
+        
 
 		this.currentTetromino.coordinates.forEach((coordinate, index) => {
 			let [i, j] = coordinate;
 			this.canvas.matrix[i][j] = this.currentTetromino.color;
 		});
 		
+		return true;
 	}
 
 
@@ -620,49 +658,42 @@ export class Game
 				}
 				else if (this.KeyPressed == 'ArrowUp')
 				{
-					this.rotate();	
-					
-					this.supportTetromino.forEach((elem) => {	
-						this.canvas.matrix[elem[0]][elem[1]] = 0;
-					});
-					
-					
-					this.supportTetromino = [];
-					
-					this.currentTetromino.coordinates.forEach((coordinate) => {
-						let temp = [];
-						
-						coordinate.forEach((elem) => {
-							temp.push(elem);
-						});
-		
-						this.supportTetromino.push(temp);
-					});
-					
-					this.tetrominoSupport(this.supportTetromino);
-					
-					let same = true;
-
-					this.supportTetromino.forEach((elem, index) => {
-						if (elem[0] !== this.currentTetromino.coordinates[index][0] ||
-							elem[1] !== this.currentTetromino.coordinates[index][1])
-							same = false;
-					});
-
-					if (same)
-					this.currentTetromino.coordinates.forEach((elem) => {
-					
-						this.canvas.matrix[elem[0]][elem[1]] = this.currentTetromino.color;
-					});	
-						
-					let isPossible = this.moveDownTetromino();
-
-					if (!isPossible)
+					let test = this.rotate();	
+					if (test)
 					{
+						this.supportTetromino.forEach((elem) => {	
+							this.canvas.matrix[elem[0]][elem[1]] = 0;
+						});
 						
-						this.currentTetromino = null;
-						this.score += 24;
-					}	
+						
+						this.supportTetromino = [];
+						
+						this.currentTetromino.coordinates.forEach((coordinate) => {
+							let temp = [];
+							
+							coordinate.forEach((elem) => {
+								temp.push(elem);
+							});
+			
+							this.supportTetromino.push(temp);
+						});
+						
+						this.tetrominoSupport(this.supportTetromino);
+						
+						let same = true;
+
+						this.supportTetromino.forEach((elem, index) => {
+							if (elem[0] !== this.currentTetromino.coordinates[index][0] ||
+								elem[1] !== this.currentTetromino.coordinates[index][1])
+								same = false;
+						});
+
+						if (same)
+						this.currentTetromino.coordinates.forEach((elem) => {
+						
+							this.canvas.matrix[elem[0]][elem[1]] = this.currentTetromino.color;
+						});	
+					}
 				}
 				else if (this.KeyPressed == 'ArrowDown' || this.KeyPressed == '')
 				{
